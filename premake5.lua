@@ -170,8 +170,10 @@ end
 
 project 'glfw'
   language 'c'
-  systemversion 'latest'
   staticruntime 'on'
+
+  filter 'not system:macosx'
+    systemversion 'latest'
 
   -- kind
   filter 'options:glfw-static'
@@ -192,8 +194,20 @@ project 'glfw'
     'src/monitor.c',
     'src/platform.c',
     'src/window.c',
-    'include/GLFW/glfw3.h',
-    'include/GLFW/glfw3native.h',
+
+    'src/egl_context.c',
+
+    'src/null_init.c',
+    'src/null_joystick.c',
+    'src/null_joystick.h',
+    'src/null_monitor.c',
+    'src/null_platform.h',
+    'src/null_window.c',
+
+    'src/osmesa_context.c',
+
+    'include/glfw/glfw3.h',
+    'include/glfw/glfw3native.h',
   }
 
   if not GLFW_NO_VULKAN then
@@ -204,6 +218,34 @@ project 'glfw'
 
   glfw_link_deps(GLFW_NO_VULKAN)
 
+  filter 'system:macosx'
+    files {
+      'src/cocoa_time.h',
+      'src/cocoa_time.c',
+      'src/posix_thread.h',
+      'src/posix_module.c',
+      'src/posix_thread.c',
+
+      'src/cocoa_platform.h',
+      'src/cocoa_joystick.h',
+      'src/cocoa_init.m',
+      'src/cocoa_joystick.m',
+      'src/cocoa_monitor.m',
+      'src/cocoa_window.m',
+      'src/nsgl_context.m',
+    }
+
+    defines {
+      '_GLFW_COCOA',
+    }
+
+    links {
+      'Cocoa.framework',
+      'IOKit.framework',
+      'CoreFoundation.framework',
+      'QuartzCore.framework',
+    }
+
   filter 'system:linux'
     pic 'on'
 
@@ -212,17 +254,6 @@ project 'glfw'
 
       'src/linux_joystick.c',
       'src/linux_joystick.h',
-
-      'src/egl_context.c',
-
-      'src/null_init.c',
-      'src/null_joystick.c',
-      'src/null_joystick.h',
-      'src/null_monitor.c',
-      'src/null_platform.h',
-      'src/null_window.c',
-
-      'src/osmesa_context.c',
 
       'src/posix_module.c',
       'src/posix_poll.c',
@@ -236,7 +267,7 @@ project 'glfw'
       'src/xkb_unicode.h',
     }
 
-    filter 'not options:glfw-no-wayland'
+    filter { 'system:linux', 'not options:glfw-no-wayland' }
       files {
           'src/wl_init.c',
           'src/wl_monitor.c',
@@ -244,7 +275,7 @@ project 'glfw'
           'src/wl_window.c',
       }
       defines { '_GLFW_WAYLAND' }
-    filter 'not options:glfw-no-x11'
+    filter { 'system:linux', 'not options:glfw-no-x11' }
       files {
           'src/x11_init.c',
           'src/x11_monitor.c',
