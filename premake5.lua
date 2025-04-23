@@ -206,8 +206,8 @@ project 'glfw'
 
     'src/osmesa_context.c',
 
-    'include/glfw/glfw3.h',
-    'include/glfw/glfw3native.h',
+    'include/GLFW/glfw3.h',
+    'include/GLFW/glfw3native.h',
   }
 
   if not GLFW_NO_VULKAN then
